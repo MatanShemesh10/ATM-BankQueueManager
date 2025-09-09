@@ -20,6 +20,10 @@ The system uses a polymorphic action model (`IServiceAction`), strict ownership 
 
 ---
 
+# Sequence diagram (ASCII)
+---
+
+```
 Sequence diagram - transfer request (ASCII)
 
 Client A              BankQueueManager             Queue (ordered set)          Client B
@@ -48,6 +52,8 @@ Notes:
 - The comparator guarantees deterministic ordering: same priority group resolve by arrivalTicket.
 - Storing the iterator returned by set::insert allows O(log n) cancel/remove by client id.
 - `transfer_atomic` implements a small local rollback to keep account balances consistent in the single-threaded model.
+
+```
 
 ---
 
