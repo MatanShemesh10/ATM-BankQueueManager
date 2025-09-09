@@ -62,12 +62,8 @@ Notes:
 - `BankQueueManager.cpp` - implementation, factory functions, JSON loading, CLI loop.  
 - `clients.json` - sample client dataset used by the loader.  
 - `starting_queue.json` - sample pre-seeded queue entries.  
-- `README_short.md` - short README for GitHub landing page.  
-- `CONTRIBUTING.md` - contribution guide and testing notes.  
-- `LICENSE` - MIT license.  
-- `demo-commands.txt` - CLI script to exercise common flows.  
-- `CMakeLists.txt` - optional CMake helper for building and enabling tests.  
-- `transfer_sequence_diagram.txt` - ASCII sequence diagram for a transfer action flow.
+- `LICENSE` - MIT license.
+
 ---
 
 ## Important implementation details and trade-offs
