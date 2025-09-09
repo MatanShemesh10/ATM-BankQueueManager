@@ -1,13 +1,22 @@
-# BankQueueManager — Full README
-
+# BankQueueManager
 A compact, production-minded C++ demo that models a bank counter service queue.  
 This repository is intentionally small but designed to show practical engineering decisions around ownership, polymorphism, deterministic scheduling, and efficient cancellation semantics. It is written to be interview-friendly: the files are focused, readable, and showcase real trade-offs.
 
 ---
 
-## Elevator pitch
+## Quick summary
 `BankQueueManager` models a bank counter queue where clients (Regular / VIP / Business) submit service requests (deposit, withdraw, check, transfer).  
 The system uses a polymorphic action model (`IServiceAction`), strict ownership (`std::unique_ptr` referred to in the codebase as "SMRT PTR"), and a `std::set` ordered by a domain-aware comparator that ensures priority and deterministic FIFO within each priority level. To enable efficient cancellation we store the iterator returned by `set::insert` so removals are O(log n) rather than O(n).
+
+---
+
+## High-level architecture
+- **Client model**: Abstract base `Client` with concrete subclasses `RegularClient`, `VipClient`, `BusinessClient`. Clients hold id and balance and expose domain operations such as `deposit()` and `withdraw()`. Client type is used by the comparator to decide priority ordering.
+- **Action model**: `IServiceAction` is the polymorphic interface for queued actions. Each concrete action (`WithdrawAction`, `DepositAction`, `CheckAction`, `TransferAction`) implements `execute()` and contains a pointer to the owning `Client`, the arrival ticket, and the relevant parameters (amount, target client id, etc).
+- **Queue**: `std::set<std::unique_ptr<IServiceAction>, IServiceActionComparator>` stores actions ordered by client priority and arrival ticket. Using `unique_ptr` in the set ensures clear ownership and simple move semantics.
+- **Iterator cache**: When inserting into the set we save the returned iterator into `ClientIdToQueueMap` (an unordered_map from client id to set iterator). This is the key trick that yields O(log n) cancellation by id.
+- **Factory functions**: Creation of `Client` subclasses and `IServiceAction` objects is centralized in factories that validate input and return `unique_ptr` instances. That keeps parsing and validation logic out of business paths.
+- **CLI and JSON loader**: A small CLI loop allows adding, canceling, serving, printing queue and clients. The loader reads `clients.json` and `starting_queue.json` at startup to populate state.
 
 ---
 
@@ -22,17 +31,6 @@ The system uses a polymorphic action model (`IServiceAction`), strict ownership 
 - `demo-commands.txt` - CLI script to exercise common flows.  
 - `CMakeLists.txt` - optional CMake helper for building and enabling tests.  
 - `transfer_sequence_diagram.txt` - ASCII sequence diagram for a transfer action flow.
-
----
-
-## High-level architecture
-- **Client model**: Abstract base `Client` with concrete subclasses `RegularClient`, `VipClient`, `BusinessClient`. Clients hold id and balance and expose domain operations such as `deposit()` and `withdraw()`. Client type is used by the comparator to decide priority ordering.
-- **Action model**: `IServiceAction` is the polymorphic interface for queued actions. Each concrete action (`WithdrawAction`, `DepositAction`, `CheckAction`, `TransferAction`) implements `execute()` and contains a pointer to the owning `Client`, the arrival ticket, and the relevant parameters (amount, target client id, etc).
-- **Queue**: `std::set<std::unique_ptr<IServiceAction>, IServiceActionComparator>` stores actions ordered by client priority and arrival ticket. Using `unique_ptr` in the set ensures clear ownership and simple move semantics.
-- **Iterator cache**: When inserting into the set we save the returned iterator into `ClientIdToQueueMap` (an unordered_map from client id to set iterator). This is the key trick that yields O(log n) cancellation by id.
-- **Factory functions**: Creation of `Client` subclasses and `IServiceAction` objects is centralized in factories that validate input and return `unique_ptr` instances. That keeps parsing and validation logic out of business paths.
-- **CLI and JSON loader**: A small CLI loop allows adding, canceling, serving, printing queue and clients. The loader reads `clients.json` and `starting_queue.json` at startup to populate state.
-
 ---
 
 ## Important implementation details and trade-offs
