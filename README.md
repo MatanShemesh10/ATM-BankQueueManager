@@ -109,46 +109,9 @@ CLI commands (examples):
 
 ---
 
-## Tests and verification ideas
-- Unit tests around:
-  - `transfer_atomic` (success, failure, rollback)
-  - `IServiceActionComparator` ordering across client types and tickets
-  - `cancel` logic (iterator validity, id collisions)
-  - JSON parsing error paths
-- Integration test:
-  - Start with pre-seeded clients, add sequence of actions, serve until empty and assert balances match expected final state.
-
-Suggested test tools: Catch2 single-header for small, fast unit tests. The provided `CMakeLists.txt` includes a basic FetchContent pattern to pull Catch2 when `-DBUILD_TESTS=ON` is used.
-
----
-
-## Extensions and next steps
-- Make the queue thread-safe by adding a mutex around the `queue` and `clientsMap`. Carefully decide on locking order when performing transfers to avoid deadlocks (order locks by client id).
-- Allow multiple queued actions per client (current mapping assumes one iterator per client id). Replace `ClientIdToQueueMap` with `unordered_map<string, vector<QueueIt>>` or similar.
-- Add structured logging (JSON) and a playback/replay mode for incident reproduction.
-- Add dynamic priority adjustments (aging/boosts) to avoid starvation for long-waiting regular clients.
-- Persist queue state to disk periodically to survive process restarts (simple checkpoint file using JSON).
-
----
-
-## Design rationale - what to say in interviews
-- Ownership: using `std::unique_ptr` (SMRT PTR) everywhere communicates clear ownership and avoids manual memory management questions.
-- Extensibility: polymorphic `IServiceAction` makes it trivial to add new service types without touching queue logic.
-- Performance trade-offs: `std::set` gives ordered access and O(log n) insertion/erase. Alternative designs (heap + index map) were considered but would complicate stable iterator semantics and cancellation by id.
-- Simplicity: single-threaded model reduces complexity and makes correctness arguments (like transfer rollback) straightforward. Concurrency is a clear extension with well-understood trade-offs.
-
----
-
 ## Contact / Attribution
 Author: Matan Shemesh
 
 License: MIT (see LICENSE file)
 
 ---
-
-If you want, I will:
-- Save this as `README.md` in the repo and provide the download link.
-- Create a variant tuned for a resume or GitHub project page (3 sentences).
-- Auto-generate a short list of talking points (4-6 bullets) you can memorize for interviews.
-
-I already prepared `README_short.md` and supporting files. Tell me which one of the follow-ups to do now and I will create it immediately.
