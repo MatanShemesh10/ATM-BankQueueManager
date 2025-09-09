@@ -20,6 +20,37 @@ The system uses a polymorphic action model (`IServiceAction`), strict ownership 
 
 ---
 
+Sequence diagram - transfer request (ASCII)
+
+Client A              BankQueueManager             Queue (ordered set)          Client B
+  |                          |                           |                         |
+  |-- add transfer request -->|                           |                         |
+  |                          |-- create TransferAction -->|                         |
+  |                          |   (unique_ptr)             |                         |
+  |                          |-- insert into set (cmp) -->|                         |
+  |                          |   comparator: [clientType, arrivalTicket]
+  |                          |                           |                         |
+  |                          |<-- iterator saved ----------|                         |
+  |                          |                           |                         |
+  |                          |--- serve (pop begin) ------------------------------->|
+  |                          |                           |                         |
+  |                          |-- TransferAction::execute()                         |
+  |                          |   - call transfer_atomic(from=A, to=B, amount)     |
+  |                          |       1) result = from->withdraw(amount)           |
+  |                          |       2) if result ok -> to->deposit(amount)       |
+  |                          |       3) if deposit fails -> from->deposit(amount)  |
+  |                          |       4) print success/failure and update balances |
+  |                          |                           |                         |
+  |<-- notification/log -----|                           |<-- balance updated -----|
+  |                          |                           |                         |
+
+Notes:
+- The comparator guarantees deterministic ordering: same priority group resolve by arrivalTicket.
+- Storing the iterator returned by set::insert allows O(log n) cancel/remove by client id.
+- `transfer_atomic` implements a small local rollback to keep account balances consistent in the single-threaded model.
+
+---
+
 ## Repo layout
 - `BankQueueManager.h` - core types, class declarations, comparator and aliases.  
 - `BankQueueManager.cpp` - implementation, factory functions, JSON loading, CLI loop.  
