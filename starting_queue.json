@@ -1,0 +1,17 @@
+{
+  "queue": [
+    { "id": "1589", "service": "withdraw", "amount": 500 },
+    { "id": "1573", "service": "deposit", "amount": 200 },
+    { "id": "8564", "service": "check" },
+    { "id": "1234", "service": "transfer", "targetId": "1589", "amount": 200 },
+    { "id": "7129", "service": "withdraw", "amount": 100 },
+    { "id": "3005", "service": "check" },
+    { "id": "9001", "service": "transfer", "targetId": "1234", "amount": 400 },
+    { "id": "4444", "service": "deposit", "amount": 300 },
+    { "id": "5555", "service": "transfer", "targetId": "6666", "amount": 100 },
+    { "id": "6666", "service": "check" },
+    { "id": "8888", "service": "withdraw", "amount": 200 },
+    { "id": "5151", "service": "withdraw", "amount": 2000 },
+    { "id": "666", "service": "transfer", "targetId": "789456", "amount": 200 }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "clients": [
+    { "id": "1234", "balance": 1200, "clientType": "REGULAR" },
+    { "id": "1589", "balance": 550, "clientType": "VIP" },
+    { "id": "1573", "balance": 3200, "clientType": "BUSINESS" },
+    { "id": "8564", "balance": 980, "clientType": "REGULAR" },
+    { "id": "4532", "balance": 5400, "clientType": "VIP" },
+    { "id": "7129", "balance": 230, "clientType": "REGULAR" },
+    { "id": "9001", "balance": 8000, "clientType": "BUSINESS" },
+    { "id": "3005", "balance": 600, "clientType": "REGULAR" },
+    { "id": "4444", "balance": 1000, "clientType": "REGULAR" },
+    { "id": "5555", "balance": 1500, "clientType": "VIP" },
+    { "id": "6666", "balance": 200, "clientType": "REGULAR" },
+    { "id": "7777", "balance": 750, "clientType": "BUSINESS" },
+    { "id": "8888", "balance": 1600, "clientType": "REGULAR" },
+    { "id": "9999", "balance": 2200, "clientType": "VIP" },
+    { "id": "5151", "balance": 50000, "clientType": "VIP" },
+    { "id": "666", "balance": 20000, "clientType": "VIP" },
+    { "id": "777", "balance": 5000, "clientType": "VIP" }
+  ]
+}
